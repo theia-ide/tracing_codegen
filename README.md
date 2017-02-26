@@ -55,7 +55,7 @@ The annotation will add the supertype `TraceSugar` for you automatically and in 
 With that, you can now prepend any accessor with an `_`, which will return a `TraceNode` containing a `TextNode` with the value.
 
 Example: 
-```
+``` xtend
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		val m = resource.contents.head as Model
 		
