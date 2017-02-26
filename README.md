@@ -56,6 +56,9 @@ With that, you can now prepend any accessor with an `_`, which will return a `Tr
 
 Example: 
 ``` xtend
+	
+	@Inject extension TraceExtensions
+	
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		val m = resource.contents.head as Model
 		
