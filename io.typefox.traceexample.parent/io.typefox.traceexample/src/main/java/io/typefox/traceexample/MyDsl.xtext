@@ -1,0 +1,32 @@
+grammar io.typefox.traceexample.MyDsl with org.eclipse.xtext.common.Terminals
+
+generate myDsl "http://www.typefox.io/traceexample/MyDsl"
+
+Model:
+	types+=ClassDeclaration*;
+	
+ClassDeclaration :
+	'class' name=ID ('extends' extends=[ClassDeclaration])? '{'
+		members+=Member*
+	'}'
+;
+
+Member :
+	Operation | Property
+;
+
+Property :
+	name=ID ':' type=TypeRef
+;
+
+Operation :
+	name=ID '(' (parameter+=Parameter (',' parameter+=Parameter)*)? ')' ':' type=TypeRef
+;
+
+TypeRef :
+	name=[ClassDeclaration]
+;
+
+Parameter :
+	name=ID ':' type=TypeRef
+;

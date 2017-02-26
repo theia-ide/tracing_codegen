@@ -1,0 +1,2 @@
+include 'io.typefox.traceexample'
+include 'io.typefox.traceexample.ide'
