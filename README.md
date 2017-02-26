@@ -67,20 +67,20 @@ Example:
 		''')
 	}
 	
-	@Traced def generateClass(ClassDeclaration clazz) '''
-		class «clazz._name» {
-			«FOR m : clazz.members»
+	@Traced def generateClass(ClassDeclaration it) '''
+		class «_name» {
+			«FOR m : members»
 				«generateMember(m)»
 			«ENDFOR»
 		}
 	'''
 	
-	@Traced def dispatch generateMember(Operation op) '''
-		«op._name»(«FOR p : op.parameter»«p._name» : «p._type[name.name]»«ENDFOR») : «op._type[name.name]»
+	@Traced def dispatch generateMember(Operation it) '''
+		«_name»(«FOR it : parameter»«_name» : «_type[name.name]»«ENDFOR») : «_type[name.name]»
 	'''
 	
-	@Traced def dispatch generateMember(Property op) '''
-		«op._name» : «op._type[name.name]»
+	@Traced def dispatch generateMember(Property it) '''
+		«_name» : «_type[name.name]»
 	'''
 ```
 
