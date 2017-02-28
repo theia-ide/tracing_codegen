@@ -18,7 +18,7 @@ import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.eclipse.xtext.generator.trace.node.Traced
-import org.eclipse.xtext.generator.trace.node.TracingExtensions
+import org.eclipse.xtext.generator.trace.node.TracedAccessors
 
 /**
  * A code generator that keeps track of traces between source and generated files.
@@ -26,10 +26,10 @@ import org.eclipse.xtext.generator.trace.node.TracingExtensions
  */
 class MyDslGenerator extends AbstractGenerator {
 	
-	@TracingExtensions(MyDslFactory)
-	static class TraceExtensions {}
+	@TracedAccessors(MyDslFactory)
+	static class MyDslTraceExtensions {}
 	
-	@Inject extension TraceExtensions
+	@Inject extension MyDslTraceExtensions
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		val m = resource.contents.head as Model
