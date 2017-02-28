@@ -63,6 +63,30 @@ During code generation we now add finer trace regions which overlay the broader/
 
 If you annotate a method that has at least one parameter of type EObject with `@Traced`, the method will use the first parameter of type EObject for tracing. So as you see above the method `generateClass` is called for every `ClassDeclaration`.
 
+Since `generateClass` is annotated with @Trace the resulting string will be mapped to the source location of the given ClassDeclaration.
+```xtend 
+	@Traced def generateClass(ClassDeclaration it) '''
+		class «_name» {
+			«FOR m : members»
+				«generateMember(m)»
+			«ENDFOR»
+		}
+	'''
+```
+
+## Finegrained Tracing
+
+To trace even more fine grained say, for instance tracing the name symbol in the generated class back to the name symbol from the source, you can use the generated accessor extensions from `MyDslTraceExtensions`. It will provide a tracing extension method for every accessor in your EMF model. Those methods start with an `_` appended with the feature name.
+
+See how the we use `_name` instead of the usual `name` in `generateClass` above.
+
+The simple trace accessors only exists for simple types, with a good `toString` representation (String, Boolean, Integer, boolean, int). But an accessor that accepts a lambda is created for all features. For example in the following we use `_type[name.name]` to trace the type name to the `type` feature of a property.
+```xtend
+	@Traced def dispatch generateMember(Property it) '''
+		«_name» : «_type[name.name]»
+	'''
+```
+
 # Concepts
 
 The tracing API is based around a tree model comprosed of `IGeneratorNode`. Out of the box the following node kinds are supported:
@@ -84,58 +108,3 @@ A `NewLineNode` is a leaf node that indicates a line break.
 
 ## TemplateNode
 A `TemplateNode` is able to wrap an Xtend Template String, which in turn can contain `IGeneratorNode` instances in evaluation parts.
-
-# API Usages
-Creating a tree of generator nodes can be done manually, but it wouldn't read well. So there is additional APIs and even active annotations that can be used to improve the readability of a tracing code generator.
-
-## TraceSugar Extensions
-
-The class `TraceSugar` provides a set of generic extension methods to create generator nodes and add children to them.
-
-## @TracingExtensions
-
-When tracing code for an EMF model, we would need to call generic functions to create a location and the actual value at the same time. With just `TraceSugar` a traced call to e.g. `myEntity.name` would look like this `myEntity.trace(MyPackage.Literals.MY_ENTITY_NAME)` which is sub obtimal. Therefore the active annotation `@TracingExtensions` can be used on a subclass of `TraceSugar` like this:
-```
-@TracingExtensions(MyDslFactory)
-class TraceExtensions {}
-```
-The annotation will add the supertype `TraceSugar` for you automatically and in addition generate trace enabled accessors for the EObject types of the provided `EcoreFactory`interface.
-
-With that, you can now prepend any accessor with an `_`, which will return a `TraceNode` containing a `TextNode` with the value.
-
-Example: 
-``` xtend
-	
-	@Inject extension TraceExtensions
-	
-	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-		val m = resource.contents.head as Model
-		
-		fsa.generateTracedFile("foo/Bar.txt", m, '''
-			// generated
-			«FOR c : m.types»
-				«generateClass(c)»
-			«ENDFOR»
-		''')
-	}
-	
-	@Traced def generateClass(ClassDeclaration it) '''
-		class «_name» {
-			«FOR m : members»
-				«generateMember(m)»
-			«ENDFOR»
-		}
-	'''
-	
-	@Traced def dispatch generateMember(Operation it) '''
-		«_name»(«FOR it : parameter»«_name» : «_type[name.name]»«ENDFOR») : «_type[name.name]»
-	'''
-	
-	@Traced def dispatch generateMember(Property it) '''
-		«_name» : «_type[name.name]»
-	'''
-```
-
-## @Traced
-
-Additional as you can see in above's example, the annotation `@Traced` can be used on template methods to let the return a `TraceNode`.
