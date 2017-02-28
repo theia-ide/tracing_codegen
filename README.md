@@ -6,7 +6,7 @@ An example project, demonstrating how to generate trace information in an Xtext 
 
 To allow going back from generated code to the original source, for instance during debugging, we need to keep track of a mapping between the orginal source code and the generated text files. While such mappings are also know as source maps, we call them trace models in Xtext.
 
-So far such trace models have only been created for Xbase expressions, but general support have been lacking. In Xtext 2.12 we [introduce a new API](https://github.com/eclipse/xtext-core/pull/288) to allow creating traces in arbitrary code generators.
+So far such trace models have only been created for Xbase expressions, but general support have been lacking. In Xtext 2.12 we [introduce a new API](https://github.com/eclipse/xtext-core/pull/288/files) to allow creating traces in arbitrary code generators.
 
 # How To
 
