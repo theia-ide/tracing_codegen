@@ -8,7 +8,7 @@ To allow going back from generated code to the original source, for instance dur
 
 So far such trace models have only been created for Xbase expressions, but general support have been lacking. In Xtext 2.12 we [introduce a new API](https://github.com/eclipse/xtext-core/pull/288) to allow creating traces in arbitrary code generators.
 
-# How Produce Tracing
+# How To
 
 To generate traces along with the actual text, we need to not only provide the text to generate but also location information about the orginal source code. To keep the code generator as readable as possible the offered API allows for very dense style.
 
