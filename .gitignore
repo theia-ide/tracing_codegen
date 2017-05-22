@@ -1,5 +1,7 @@
 bin/
+src-gen/
 xtext-gen/
 xtend-gen/
 .gradle/
 build/
+.antlr-generator-*.jar

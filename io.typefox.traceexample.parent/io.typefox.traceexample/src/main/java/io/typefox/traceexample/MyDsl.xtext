@@ -16,25 +16,19 @@ Model:
 ClassDeclaration :
 	'class' name=ID ('extends' extends=[ClassDeclaration])? '{'
 		members+=Member*
-	'}'
-;
+	'}';
 
 Member :
-	Operation | Property
-;
+	Operation | Property;
 
 Property :
-	name=ID ':' type=TypeRef
-;
+	name=ID ':' type=TypeRef;
 
 Operation :
-	name=ID '(' (parameter+=Parameter (',' parameter+=Parameter)*)? ')' ':' type=TypeRef
-;
+	name=ID '(' (parameters+=Parameter (',' parameters+=Parameter)*)? ')' ':' type=TypeRef;
 
 TypeRef :
-	name=[ClassDeclaration]
-;
+	declaration=[ClassDeclaration];
 
 Parameter :
-	name=ID ':' type=TypeRef
-;
+	name=ID ':' type=TypeRef;

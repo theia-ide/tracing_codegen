@@ -51,11 +51,11 @@ class MyDslGenerator extends AbstractGenerator {
 	'''
 	
 	@Traced def dispatch generateMember(Operation it) '''
-		«_name»(«FOR it : parameter»«_name» : «_type[name.name]»«ENDFOR») : «_type[name.name]»
+		«_name»(«FOR it : parameters»«_name» : «_type[declaration.name]»«ENDFOR») : «_type[declaration.name]»
 	'''
 	
 	@Traced def dispatch generateMember(Property it) '''
-		«_name» : «_type[name.name]»
+		«_name» : «_type[declaration.name]»
 	'''
 	
 }
