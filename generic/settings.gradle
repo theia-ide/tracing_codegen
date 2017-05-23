@@ -1,2 +1,4 @@
+rootProject.name = 'traceexample_generic'
+
 include 'io.typefox.traceexample'
 include 'io.typefox.traceexample.ide'
