@@ -56,16 +56,23 @@ class MyDslGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		val model = resource.contents.head as Model
-		val baseName = resource.baseName
-		
 		if (model !== null) {
+			val baseName = resource.baseName
+			
 			fsa.generateTracedFile(baseName + '.h', model, '''
 				/********************************
 				 * Header file for «resource.URI.lastSegment»
 				 */
 				
-				#ifndef «baseName.toUpperCase»
-				#define «baseName.toUpperCase»
+				#ifndef «baseName.toUpperCase»_H
+				#define «baseName.toUpperCase»_H
+				«IF !model.types.empty»
+					
+					/* Predeclaration of all types so they can be resolved properly */
+					«FOR c : model.types»
+						typedef struct _«c.name» «c._name»;
+					«ENDFOR»
+				«ENDIF»
 				
 				«FOR r : model.findReferencedResources»
 					#include "«r.baseName».h"
@@ -98,13 +105,13 @@ class MyDslGenerator extends AbstractGenerator {
 		/*
 		 * Declaration of «name» class
 		 */
-		typedef struct
+		struct _«_name»
 		{
 			«FOR p : members.filter(Property)»
 				/* Property «name».«p.name» */
 				«generateDeclaration(p)»
 			«ENDFOR»
-		} «_name»;
+		};
 		«FOR o : members.filter(Operation)»
 			
 			/* Operation «name».«o.name» */
@@ -124,29 +131,17 @@ class MyDslGenerator extends AbstractGenerator {
 		«ENDFOR»
 	'''
 	
-	private def generateType(TypeRef typeRef, boolean reference) {
+	private def generateType(TypeRef typeRef) {
 		switch decl: typeRef.declaration {
 			case library.getType('number'): 'double'
 			case library.getType('string'): 'char*'
-			case decl !== null && !decl.eIsProxy:
-				if (reference)
-					decl.name + '*'
-				else
-					decl.name
-		}
-	}
-	
-	private def isStructType(TypeRef typeRef) {
-		switch typeRef.declaration {
-			case library.getType('number'),
-			case library.getType('string'): false
-			default: true
+			case decl !== null && !decl.eIsProxy: decl.name + '*'
 		}
 	}
 	
 	protected def generateDeclaration(Property prop) {
 		val n = prop.trace
-		n.append(prop._type[generateType(false)])
+		n.append(prop._type[generateType])
 		n.append(' ')
 		n.append(prop._name)
 		n.append(';')
@@ -155,7 +150,7 @@ class MyDslGenerator extends AbstractGenerator {
 	
 	protected def generateDeclaration(Operation op) {
 		val n = op.trace
-		n.append(op._type[generateType(true)])
+		n.append(op._type[generateType])
 		n.append(' ')
 		val classDecl = op.eContainer as ClassDeclaration
 		n.append(classDecl.name)
@@ -166,7 +161,7 @@ class MyDslGenerator extends AbstractGenerator {
 		n.append('* this')
 		for (param : op.parameters) {
 			n.append(', ')
-			n.append(param.trace.append(param._type[generateType(true)]).append(' ').append(param._name))
+			n.append(param.trace.append(param._type[generateType]).append(' ').append(param._name))
 		}
 		n.append(')')
 		return n
@@ -189,12 +184,11 @@ class MyDslGenerator extends AbstractGenerator {
 	private def String generateExpression(Expression expression, CompositeGeneratorNode parent, Scope scope) {
 		if (expression instanceof FeatureCall) {
 			val n = trace(expression)
-			val receiverVar = if (expression.receiver !== null)
-				expression.receiver.generateExpression(n, scope)
+			val receiverVar = expression.receiver?.generateExpression(n, scope)
 			val paramVars = newArrayList
 			expression.parameters.forEach[paramVars += generateExpression(n, scope)]
 			val resultVar = scope.nextVarName
-			n.append(generateType(expression.feature?.type, true))
+			n.append(generateType(expression.feature?.type))
 			n.append(' ')
 			n.append(resultVar)
 			switch feature : expression.feature {
@@ -204,8 +198,6 @@ class MyDslGenerator extends AbstractGenerator {
 				}
 				Property: {
 					n.append(' = ')
-					if (isStructType(expression.feature?.type))
-						n.append('&')
 					n.append(receiverVar ?: 'this')
 					n.append('->')
 					n.append(feature.name)
