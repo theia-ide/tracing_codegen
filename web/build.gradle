@@ -1,6 +1,5 @@
 buildscript {
 	repositories {
-		mavenLocal()
 		jcenter()
 	}
 	dependencies {
@@ -12,9 +11,6 @@ subprojects {
 	ext.xtextVersion = '2.12.0'
 	repositories {
 		jcenter()
-		maven {
-			url 'https://oss.sonatype.org/content/repositories/snapshots'
-		}
 	}
 	
 	apply plugin: 'java'
@@ -24,7 +20,7 @@ subprojects {
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
 	
-	group = 'io.typefox.traceexample'
+	group = 'io.typefox.traceexample.javascript'
 	version = '1.0.0-SNAPSHOT'
 	
 	sourceCompatibility = '1.8'

@@ -1,0 +1,5 @@
+rootProject.name = 'traceexample_web'
+
+include 'io.typefox.traceexample.javascript'
+include 'io.typefox.traceexample.javascript.ide'
+include 'io.typefox.traceexample.javascript.web'
