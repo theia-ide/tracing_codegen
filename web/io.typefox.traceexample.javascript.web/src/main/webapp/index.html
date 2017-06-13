@@ -15,7 +15,10 @@
 	</div>
 	<button type="button" id="run_program">Run</button>
 	<div class="content">
-		<div id="xtext-editor" data-editor-xtext-lang="calc"></div>
+		<div id="xtext-editor" data-editor-xtext-lang="calc">let x = 2
+let y = 10 * x + 1
+let z = 2 * y
+output z</div>
 	</div>
 </div>
 
@@ -43,10 +46,13 @@
 				baseUrl: baseUrl,
 				syntaxDefinition: "xtext-resources/generated/mode-calc"
 			});
-			var resourceId = editor.xtextServices.options.resourceId;
 			document.getElementById("run_program").addEventListener("click", function() {
-				require(["xtext-service/generate?resource=" + resourceId + "&artifact=calc.js&includeContent=true"], function(calc) {
-					calc.execute();
+				var resourceId = editor.xtextServices.options.resourceId;
+				var calcModule = "xtext-service/generate?resource=" + resourceId + "&artifact=calc.js";
+				require.undef(calcModule);
+				require([calcModule], function(calc) {
+					if (calc.execute)
+						calc.execute();
 				});
 			});
 		});

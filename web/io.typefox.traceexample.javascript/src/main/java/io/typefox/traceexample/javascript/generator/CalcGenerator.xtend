@@ -20,7 +20,9 @@ import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.eclipse.xtext.generator.trace.node.CompositeGeneratorNode
+import org.eclipse.xtext.generator.trace.node.GeneratorNodeProcessor
 import org.eclipse.xtext.generator.trace.node.TracingSugar
+import org.eclipse.xtext.resource.XtextResource
 
 /**
  * Generates code from your model files on save.
@@ -28,11 +30,16 @@ import org.eclipse.xtext.generator.trace.node.TracingSugar
 class CalcGenerator extends AbstractGenerator {
 	
 	@Inject extension TracingSugar
+	
+	@Inject GeneratorNodeProcessor processor
+	
+	@Inject SourceMapGenerator sourceMapGenerator
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		val calculation = resource.contents.head as Calculation
 		if (calculation !== null) {
-			fsa.generateTracedFile('calc.js', calculation, '''
+			
+			val rootNode = trace(calculation, '''
 				// Generated from «resource.URI.lastSegment»
 				define({
 					execute: function() {
@@ -41,7 +48,16 @@ class CalcGenerator extends AbstractGenerator {
 						«ENDFOR»
 					}
 				});
+				
+				//# sourceMappingURL=/xtext-service/generate?resource=«resource.URI»&artifact=calc.js.map
 			''')
+			
+			val result = processor.process(rootNode)
+			fsa.generateFile('calc.js', result)
+			val sourceMap = sourceMapGenerator.generateSourceMap(result, resource as XtextResource)
+			fsa.generateFile('calc.js.map', sourceMap)
+		} else {
+			fsa.generateFile('calc.js', 'define({});')
 		}
 	}
 	

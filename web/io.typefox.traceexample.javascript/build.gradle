@@ -1,6 +1,7 @@
 dependencies {
 	compile "org.eclipse.xtext:org.eclipse.xtext:${xtextVersion}"
 	compile "org.eclipse.xtext:org.eclipse.xtext.xbase:${xtextVersion}"
+	compile "com.google.code.gson:gson:2.7"
 }
 configurations {
 	mwe2 {
