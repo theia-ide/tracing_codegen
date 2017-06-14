@@ -60,6 +60,8 @@ class Phone {
 
 In order to import the project in Eclipse, install [Buildship](https://projects.eclipse.org/projects/tools.buildship/downloads) and use the Gradle import wizard.
 
+Note that the [SourceMapGenerator](https://github.com/TypeFox/tracing_codegen/blob/master/web/io.typefox.traceexample.javascript/src/main/java/io/typefox/traceexample/javascript/generator/SourceMapGenerator.xtend) class is not specific to the example DSL, but is able to generate JavaScript source maps for any Xtext language that uses the new tracing API.
+
 ## How To
 
 To generate traces along with the actual text, we need to not only provide the text to generate but also location information about the orginal source code. To keep the code generator as readable as possible the offered API allows for very dense style.
