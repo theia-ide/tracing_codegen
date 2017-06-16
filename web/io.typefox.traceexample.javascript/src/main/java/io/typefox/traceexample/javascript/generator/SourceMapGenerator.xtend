@@ -9,7 +9,9 @@ package io.typefox.traceexample.javascript.generator
 
 import com.google.gson.Gson
 import java.util.ArrayList
+import java.util.Collection
 import java.util.List
+import java.util.TreeSet
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend2.lib.StringConcatenation
 import org.eclipse.xtext.generator.trace.AbstractTraceRegion
@@ -33,7 +35,7 @@ class SourceMapGenerator {
 	}
 	
 	protected def CharSequence generateMappings(AbstractTraceRegion rootTrace, Document source, Document target) {
-		val segments = newArrayList
+		val segments = new TreeSet
 		val iterator = rootTrace.treeIterator
 		var targetLine = 0
 		while (iterator.hasNext) {
@@ -49,7 +51,7 @@ class SourceMapGenerator {
 		return generateSegments(segments)
 	}
 	
-	protected def CharSequence generateSegments(List<Segment> segments) {
+	protected def CharSequence generateSegments(Collection<Segment> segments) {
 		val result = new StringConcatenation
 		
 		var previousSourceLine = 0
@@ -135,11 +137,26 @@ class SourceMapGenerator {
 	}
 	
 	@Data
-	private static class Segment {
+	private static class Segment implements Comparable<Segment> {
+		
 		val int sourceLine
 		val int sourceColumn
 		val int targetLine
 		val int targetColumn
+		
+		override compareTo(Segment other) {
+			Integer.compare(this.sourceLine, other.sourceLine)
+				.thenCompare(this.sourceColumn, other.sourceColumn)
+				.thenCompare(this.targetLine, other.targetLine)
+				.thenCompare(this.targetColumn, other.targetColumn)
+		}
+		
+		private def thenCompare(int previousResult, int x, int y) {
+			if (previousResult == 0)
+				return Integer.compare(x, y)
+			else
+				return previousResult
+		}
 	}
 	
 }
